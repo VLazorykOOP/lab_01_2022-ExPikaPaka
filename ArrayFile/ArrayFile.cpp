@@ -14,8 +14,7 @@ void CText(const char t[], int color) {
 int userSize;
 const int ARRAY_MAX_SIZE = 560;
 
-enum { AStatic, ANew, ACalloc, AVec };
-int AMode;
+
 
 int ConsoleInputSizeArray(const int sizeMax)
 {
@@ -85,93 +84,6 @@ int RndInputArray(int sizeMax, double A[])
         A[i] = A[i] / (1.0 + r2);
         if (r3 % 3 == 0) A[i] = -A[i];
         std::cout << A[i] << "   ";
-    }
-    return size;
-}
-
-int ConsoleInputDynamicArrayNew(int sizeMax, double* pA) {
-    char buff[256];
-    char buf[16];
-
-    int size = ConsoleInputSizeArray(sizeMax);
-    pA = new double[size];
-    if (pA == nullptr) { return 0; }
-    for (int i = 0; i < size; i++) {
-        _itoa_s(i, buf, 10);
-        CText("  Введіть елемент ", 3);
-        CText("[", 12);
-        CText(buf, 12);
-        CText("] ", 12);
-        CText(": ", 3);
-
-        std::cin >> pA[i];
-        if (std::cin.fail()) {
-            CText(" Неправильне значення! Введіть раціональні число!   \n", 112);
-
-            std::cin.clear();
-            std::cin >> buff;
-            i--;
-        }
-
-    }
-    return size;
-}
-
-int ConsoleInputDynamicArray_calloc(int sizeMax, double* pA) {
-    char buff[256];
-    char buf[16];
-
-    int size = ConsoleInputSizeArray(sizeMax);
-    pA = (double*)calloc(size, sizeof(double));      // pA = (double*)malloc(size * sizeof(double)); 
-    if (pA == nullptr) { return 0; }
-    for (int i = 0; i < size; i++) {
-        _itoa_s(i, buf, 10);
-        CText("  Введіть елемент ", 3);
-        CText("[", 12);
-        CText(buf, 12);
-        CText("] ", 12);
-        CText(": ", 3);
-
-        std::cin >> pA[i];
-        if (std::cin.fail()) {
-            CText(" Неправильне значення! Введіть раціональні число!   \n", 112);
-
-            std::cin.clear();
-            std::cin >> buff;
-            i--;
-        }
-
-    }
-    return size;
-}
-
-int ConsoleInputVector(int sizeMax, std::vector<double> &A) {
-    char buff[256];
-    char buf[16];
-
-    int size = ConsoleInputSizeArray(sizeMax);
-    double d;
-
-    for (int i = 0; i < size; i++) {
-        _itoa_s(i, buf, 10);
-        CText("  Введіть елемент ", 3);
-        CText("[", 12);
-        CText(buf, 12);
-        CText("] ", 12);
-        CText(": ", 3);
-
-        std::cin >> d;
-        if (std::cin.fail()) {
-            CText(" Неправильне значення! Введіть раціональні число!   \n", 112);
-
-            std::cin.clear();
-            std::cin >> buff;
-            i--;
-        }
-        else {
-            A.push_back(d);
-        }
-
     }
     return size;
 }
@@ -361,9 +273,6 @@ void ShowInputMenu() {
     std::cout << '\n';
     CText("  1. Рандомно\n", 11);
     CText("  2. З консолі (статичний масив)\n", 11);
-   /* CText("  3. З консолі (calloc)\n", 11);
-    CText("  4. З консолі (new)\n", 11);
-    CText("  5. З консолі (vector)\n", 11);*/
     CText("  3. Вийти \n\n\n", 11);
 
     CText("  Виберіть спосіб з меню : ", 3);
@@ -372,7 +281,7 @@ void ShowInputMenu() {
 
 
 
-int InputManager(double* arr, double* arr2, double* arrNew, double* arrCalloc, std::vector<double> arrVec) {
+int InputManager(double* arr, double* arr2) {
     int key;
     char buff[256];
     char fileAddress[1024];
@@ -385,7 +294,7 @@ int InputManager(double* arr, double* arr2, double* arrNew, double* arrCalloc, s
         CText("Невірно введений запит! Введіть число від 1 до 3\n", 112);
         std::cin.clear();
         std::cin >> buff;
-        InputManager(arr, arr2, arrNew, arrCalloc, arrVec);
+        InputManager(arr, arr2);
     }
     else switch (key) {
 
@@ -394,26 +303,9 @@ int InputManager(double* arr, double* arr2, double* arrNew, double* arrCalloc, s
         break;
 
     case 2:
-        AMode = AStatic;
         userSize = ConsoleInputArray(ARRAY_MAX_SIZE, arr);
         break;
-
-    /*case 3:
-        AMode = ACalloc;
-        userSize = ConsoleInputDynamicArray_calloc(ARRAY_MAX_SIZE, arrCalloc);
-        break;
-
-    case 4:
-        AMode = ANew;
-        userSize = ConsoleInputDynamicArrayNew(ARRAY_MAX_SIZE, arrNew);
-        break;
-
-    case 5:
-        AMode = AVec;
-        userSize = ConsoleInputVector(ARRAY_MAX_SIZE, arrVec);
-        break;*/
-  
-       
+    
     case 3:
         break;
 
@@ -421,7 +313,7 @@ int InputManager(double* arr, double* arr2, double* arrNew, double* arrCalloc, s
         std::cout << "  ";
         CText("Вибраний не правильний спосіб!\n", 112);
         CText("\n\n\n  Виберіть спосіб з меню : ", 3);
-        InputManager(arr, arr2, arrNew, arrCalloc, arrVec);
+        InputManager(arr, arr2);
         break;
     }
 
@@ -443,7 +335,7 @@ void ShowMainMenu() {
     CText("  Виберіть дію з меню : ", 3);
 }
 
-void MenuManager(double *arr, double *arr2, double *arrNew, double *arrCalloc, std::vector<double> arrVec) {
+void MenuManager(double *arr, double *arr2) {
     int key;
     char buff[256];
 
@@ -454,46 +346,33 @@ void MenuManager(double *arr, double *arr2, double *arrNew, double *arrCalloc, s
         CText("Невірно введений запит! Введіть число від 1 до 5\n", 112);
         std::cin.clear();
         std::cin >> buff;
-        MenuManager(arr, arr2, arrNew, arrCalloc, arrVec);
+        MenuManager(arr, arr2);
     }
     else switch (key) {
 
     case 1:
         ShowInputMenu();
-        InputManager(arr, arr2, arrNew, arrCalloc, arrVec);
-        if (AMode == AStatic) WriteArrayTextFile(userSize, arr, "Task_1_Original_Array.txt");
-        //if (AMode == ANew) WriteArrayTextFile(userSize, arrNew, "Task_1_Original_Array.txt");
-        //if (AMode == ACalloc) WriteArrayTextFile(userSize, arrCalloc, "Task_1_Original_Array.txt");
-
+        InputManager(arr, arr2);
+        WriteArrayTextFile(userSize, arr, "Task_1_Original_Array.txt");
+    
         CText("\n\n  Результат задачі : \n", 3);
-        if (AMode == AStatic) Task1_v11(userSize, arr);
-        //if (AMode == ANew) Task1_v11(userSize, arr);
-        //if (AMode == ACalloc) Task1_v11(userSize, arr);
-        
-        if (AMode == AStatic) WriteArrayTextFile(userSize, arr, "Task_1_Modificated_Array.txt");
-        //if (AMode == ANew) WriteArrayTextFile(userSize, arrNew, "Task_1_Modificated_Array.txt");
-        //if (AMode == ACalloc) WriteArrayTextFile(userSize, arrCalloc, "Task_1_Modificated_Array.txt");
+        Task1_v11(userSize, arr);
+        WriteArrayTextFile(userSize, arr, "Task_1_Modificated_Array.txt");
+     
         CText("\n\n\n  Виберіть дію з меню : ", 3);
-        MenuManager(arr, arr2, arrNew, arrCalloc, arrVec);
+        MenuManager(arr, arr2);
 
     case 2:
         ShowInputMenu();
-        InputManager(arr, arr2, arrNew, arrCalloc, arrVec);
-        if (AMode == AStatic) WriteArrayTextFile(userSize, arr, "Task_2_Original_Array.txt");
-        //if (AMode == ANew) WriteArrayTextFile(userSize, arrNew, "Task_2_Original_Array.txt");
-        //if (AMode == ACalloc) WriteArrayTextFile(userSize, arrCalloc, "Task_2_Original_Array.txt");
-
+        InputManager(arr, arr2);
+        WriteArrayTextFile(userSize, arr, "Task_2_Original_Array.txt");
+        
         CText("\n\n  Результат задачі : \n", 3);
-        if (AMode == AStatic) Task2_v11(userSize, arr);
-        //if (AMode == ANew) Task2_v11(userSize, arrNew);
-        //if (AMode == ACalloc) Task2_v11(userSize, arrCalloc);
-
-        if (AMode == AStatic) WriteArrayTextFile(userSize, arr, "Task_2_Modificated_Array.txt");
-        //if (AMode == ANew) WriteArrayTextFile(userSize, arrNew, "Task_2_Modificated_Array.txt");
-        //if (AMode == ACalloc) WriteArrayTextFile(userSize, arrCalloc, "Task_2_Modificated_Array.txt");
-
+        Task2_v11(userSize, arr);
+        WriteArrayTextFile(userSize, arr, "Task_2_Modificated_Array.txt");
+        
         CText("\n\n\n  Виберіть дію з меню : ", 3);
-        MenuManager(arr, arr2, arrNew, arrCalloc, arrVec);
+        MenuManager(arr, arr2);
 
     case 3:
         CText("  Введіть 6 координат трикутника (x1, y1)..\n", 3);
@@ -507,12 +386,12 @@ void MenuManager(double *arr, double *arr2, double *arrNew, double *arrCalloc, s
         Task3_v11(userSize, arr, arr2);
         WriteArrayTextFile(userSize, arr2, "Task_3_Triangle_Array.txt");
         CText("\n\n\n  Виберіть дію з меню : ", 3);
-        MenuManager(arr, arr2, arrNew, arrCalloc, arrVec);
+        MenuManager(arr, arr2);
 
     case 4:
         system("cls");
         ShowMainMenu();
-        MenuManager(arr, arr2, arrNew, arrCalloc, arrVec);
+        MenuManager(arr, arr2);
 
     case 5:
         exit(0);
@@ -521,7 +400,7 @@ void MenuManager(double *arr, double *arr2, double *arrNew, double *arrCalloc, s
         std::cout << "  ";
         CText("Вибране не правильне завдання!\n", 112);
         CText("\n\n\n  Виберіть дію з меню : ", 3);
-        MenuManager(arr, arr2, arrNew, arrCalloc, arrVec);
+        MenuManager(arr, arr2);
         break;
     }
     
@@ -534,14 +413,12 @@ int main() {
     system("chcp 1251");
     system("cls");
 
-    double A[ARRAY_MAX_SIZE], B[ARRAY_MAX_SIZE],C[ARRAY_MAX_SIZE];
+    double A[ARRAY_MAX_SIZE], B[ARRAY_MAX_SIZE];
 
-    double* ANew = NULL;
-    double* ACalloc = NULL;
-    std::vector<double> AVector;
+    
 
     ShowMainMenu();
-    MenuManager(A, B, ANew, ACalloc, AVector);
+    MenuManager(A, B);
     
     return 0;
 }
