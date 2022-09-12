@@ -304,9 +304,10 @@ void Task1_v11(int arrSize, double* arr) {
 
 void Task2_v11(int arrSize, double* arr) {
     int pos1 = 0;
-    int pos2 = 0;
+    int pos2 = -1;
     int size = 0;
-    double elMin = 0;
+    int elMin = 0;
+    int num = 0;
     char buf[16];
     bool fl = 0;
 
@@ -341,84 +342,33 @@ void Task2_v11(int arrSize, double* arr) {
 
 
     pos1++;
-    size = arrSize - pos1;
-    elMin = (double)pos1;
+    if (isVec)
+        elMin = (int)AVec[pos1];
+    else
+        elMin = (int)arr[pos1];
 
-    if (pos1 < arrSize - 1) {       // Summing by pare, and moving everything
+    if (pos1 < arrSize - 1) {
         while (pos1 < arrSize - 1) {
-            if (isVec) {
-                AVec[pos1] += AVec[pos1 + 1];
-                pos2 = pos1 + 1;
-                while (pos2 < arrSize - 1) {
-                    AVec[pos2] = AVec[pos2 + 1];
-                    if (pos2 == arrSize - 1) AVec[pos2] = 0;
-                    pos2++;
-
-                }
-            }
-            else {
-                arr[pos1] += arr[pos1 + 1];
-                pos2 = pos1 + 1;
-                while (pos2 < arrSize - 1) {
-                    arr[pos2] = arr[pos2 + 1];
-                    if (pos2 == arrSize - 1) arr[pos2] = 0;
-                    pos2++;
-
-                }
-
-            }
-            arrSize--;
+            if (isVec)
+                num = (int)AVec[pos1];
+            else
+                num = (int)arr[pos1];
+            if (num >= 0)
+                if (num % 2 == 0) 
+                    if (num < elMin) {
+                        elMin = num;
+                        pos2 = pos1;
+                    }
             pos1++;
         }
     }
-    if (pos1 != arrSize - 1)    // Exception wrong size
-        if (size % 2 != 0) arrSize++;
 
+   
 
-
-    pos1 = elMin;
-    pos2 = pos1;
-    if (isVec) {
-        elMin = AVec[pos1]; // Minimal element
-    }
-    else {
-        elMin = arr[pos1]; // Minimal element
-    }
-
-    
-
-    while (pos1 < arrSize) {        // Finding last minimal element from pos1
-        if (isVec) {
-            if (AVec[pos1] < elMin) {
-                elMin = AVec[pos1];
-                pos2 = pos1;
-            }
-        }
-        else {
-            if (arr[pos1] < elMin) {
-                elMin = arr[pos1];
-                pos2 = pos1;
-            }
-        }
-        pos1++;
-    }
-
-    std::cout << "  ";
-
-    if (isVec) {
-        for (int i = 0; i < arrSize; i++)
-            std::cout << AVec[i] << "   ";
-    }
-    else {
-        for (int i = 0; i < arrSize; i++)
-            std::cout << arr[i] << "   ";
-    }
-    std::cout << "\n";
-
-    if (pos2 != arrSize) {
-        _itoa_s(pos2 + 1, buf, 10);
+    if (pos2 != -1) {
+        _itoa_s(pos2, buf, 10);
         std::cout << "  ";
-        CText("Номер останього мінімального елемента за умовою : ", 112);
+        CText("Індекс останього мінімального елемента за умовою : ", 112);
         CText(" ", 128);
         CText(buf, 128);
         CText(" ", 128);
@@ -427,9 +377,7 @@ void Task2_v11(int arrSize, double* arr) {
     else {
         std::cout << "  ";
         CText("Не існує мінімального елементу за умовою задачі!\n", 112);
-    }
-    userSize = arrSize;
-   
+    }   
 }
 
 
