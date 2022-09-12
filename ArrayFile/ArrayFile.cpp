@@ -13,6 +13,10 @@ void CText(const char t[], int color) {
 
 int userSize;
 const int ARRAY_MAX_SIZE = 560;
+double* Pt = NULL;
+std::vector<double> AVec;
+bool isVec = 0;
+
 
 
 
@@ -94,8 +98,14 @@ void WriteArrayTextFile(int n, double *arr, const char *fileName ) {
     std::ofstream fout(fileName);
     if (fout.fail()) return;
     fout << n << std::endl;
-    for (int i = 0; i < n; i++)
-        fout << arr[i] << "   ";
+
+    if (isVec) 
+        for (int i = 0; i < n; i++)
+            fout << AVec[i] << "   ";
+    else 
+        for (int i = 0; i < n; i++)
+            fout << arr[i] << "   ";
+    
 
     CText("\n\n  ", 0);
     CText("Дані збережено у файл  ", 112);
@@ -112,26 +122,181 @@ void WriteArrayTextFile(int n, double *arr, const char *fileName ) {
 }
 
 
+int ReadArrayTextFile(int n, double* arr, const char* fileName) {
+    int size = 0;
+    char fileAddress[1024];
+    memset(fileAddress, 0, sizeof(fileAddress));
+
+    std::ifstream fin(fileName);
+    if (fin.fail()) {
+        CText("Неможливо відкрити файл!\n", 112);
+        std::cout << "  ";
+        CText("Введіть ім'я файлу (1.txt) (..\\1.txt) : ", 3);
+        std::cin >> fileAddress;
+        size = ReadArrayTextFile(n, arr, fileAddress);
+        return size;
+    }
+    fin >> size;
+    
+    if (size <= 0) {
+        std::cout << "  ";
+        CText("Файл пустий!\n", 112);
+        return 0;
+    }
+
+    std::cout << "  ";
+    for (int i = 0; i < size; i++) {
+        fin >> arr[i];
+        std::cout << arr[i] << "   ";
+    }
+    std::cout << "\n";
+    fin.close();
+    return size;
+}
+
+
+
+int ConsoleInputDynamicArrayNew(int sizeMax, double* pA) {
+
+    char buff[256];
+    char buf[16];
+
+
+    pA = new double[sizeMax];
+    if (pA == NULL) {
+        std::cout << "  ";
+        CText("Неможливо ініціалізувати масив\n", 112);
+        return 0;
+    }
+
+
+    int size = ConsoleInputSizeArray(sizeMax);
+    for (int i = 0; i < size; i++) {
+        _itoa_s(i, buf, 10);
+        CText("  Введіть елемент ", 3);
+        CText("[", 12);
+        CText(buf, 12);
+        CText("] ", 12);
+        CText(": ", 3);
+
+        std::cin >> pA[i];
+        if (std::cin.fail()) {
+            CText(" Неправильне значення! Введіть раціональні число!   \n", 112);
+
+            std::cin.clear();
+            std::cin >> buff;
+            i--;
+        }
+    }
+    Pt = pA;
+    return size;
+}
+
+int ConsoleInputDynamicArray_calloc(int sizeMax, double* pA) {
+
+    char buff[256];
+    char buf[16];
+
+    int size = ConsoleInputSizeArray(sizeMax);
+    pA = (double*)calloc(size, sizeof(double));      // pA = (double*)malloc(size * sizeof(double)); 
+    if (pA == nullptr) { return 0; }
+    for (int i = 0; i < size; i++) {
+        _itoa_s(i, buf, 10);
+        CText("  Введіть елемент ", 3);
+        CText("[", 12);
+        CText(buf, 12);
+        CText("] ", 12);
+        CText(": ", 3);
+
+        std::cin >> pA[i];
+        if (std::cin.fail()) {
+            CText(" Неправильне значення! Введіть раціональні число!   \n", 112);
+
+            std::cin.clear();
+            std::cin >> buff;
+            i--;
+        }
+    }
+    Pt = pA;
+    return size;
+}
+
+
+int ConsoleInputVector(int sizeMax, std::vector<double>& A) {
+
+    char buff[256];
+    char buf[16];
+
+    int size = ConsoleInputSizeArray(sizeMax);
+    double d;
+    for (int i = 0; i < size; i++) {
+        _itoa_s(i, buf, 10);
+        CText("  Введіть елемент ", 3);
+        CText("[", 12);
+        CText(buf, 12);
+        CText("] ", 12);
+        CText(": ", 3);
+
+        std::cin >> d;
+        if (std::cin.fail()) {
+            CText(" Неправильне значення! Введіть раціональні число!   \n", 112);
+
+            std::cin.clear();
+            std::cin >> buff;
+            i--;
+        }
+        else
+            A.push_back(d);
+    }
+    isVec = 1;
+    return size;
+}
+
 
 void ShowMainMenu();
 void MenuManager();
 
 
 
-void Task1_v11(int arrSize, double *arr) {
+void Task1_v11(int arrSize, double* arr) {
+    
+    
+    if (arrSize == 1) {
+        if (isVec)
+            AVec[0] *= 2;
+        else
+            arr[0] *= 2;
+    }
+    else {
+        if (isVec) {
+            for (int i = 0; i < arrSize / 2; i++)
+                AVec[i] *= 2;
+        }
+        else {
+            for (int i = 0; i < arrSize / 2; i++)
+                arr[i] *= 2;
+        }
+    }
 
-    if (arrSize == 1)
-        arr[0] *= 2;
-    else
-        for (int i = 0; i < arrSize / 2; i++)
-            arr[i] *= 2;
-
-    for (int i = (arrSize / 2); i <= arrSize; i++)
-        arr[i] *= 3;
+    if (isVec) {
+        for (int i = (arrSize / 2); i < arrSize; i++)
+            AVec[i] *= 3;
+    }
+    else {
+        for (int i = (arrSize / 2); i < arrSize; i++)
+            arr[i] *= 3;
+    }
 
     std::cout << "  ";
-    for (int i = 0; i < arrSize; i++)
-        std::cout << arr[i] << "   ";
+    if (isVec) {
+        for (int i = 0; i < arrSize; i++)
+            std::cout << AVec[i] << "   ";
+    }
+    else {
+        for (int i = 0; i < arrSize; i++)
+            std::cout << arr[i] << "   ";
+    }
+
    
 }
 
@@ -145,14 +310,32 @@ void Task2_v11(int arrSize, double* arr) {
     char buf[16];
     bool fl = 0;
 
-    while (arr[pos1] >= 0) {     // Finding first negative element
-        pos1++;
-        if (pos1 > arrSize - 1) {
-            std::cout << " ";
-            CText("У масиві не має від'ємних елементів! Введіть масив знову.\n", 112);
-            fl = 1;
-            break;
+    if (isVec) {
+        while (AVec[pos1] >= 0) {     // Finding first negative element
+            pos1++;
+            if (pos1 > arrSize - 1) {
+                std::cout << " ";
+                CText("У масиві не має від'ємних елементів! Введіть масив знову.\n", 112);
+                fl = 1;
+                break;
+            }
         }
+    }
+    else {
+        while (arr[pos1] >= 0) {     // Finding first negative element
+            pos1++;
+            if (pos1 > arrSize - 2) {
+                std::cout << " ";
+                CText("У масиві не має від'ємних елементів! Введіть масив знову.\n", 112);
+                fl = 1;
+                break;
+            }
+        }
+    }
+    if (arrSize == 1) {
+        std::cout << " ";
+        CText("У масиві не має від'ємних елементів! Введіть масив знову.\n", 112);
+        fl = 1;
     }
     if (fl) return;
 
@@ -162,13 +345,26 @@ void Task2_v11(int arrSize, double* arr) {
     elMin = (double)pos1;
 
     if (pos1 < arrSize - 1) {       // Summing by pare, and moving everything
-        while (pos1 < arrSize) {
-            arr[pos1] += arr[pos1 + 1];
-            pos2 = pos1 + 1;
-            while (pos2 < arrSize) {
-                arr[pos2] = arr[pos2 + 1];
-                if (pos2 == arrSize - 1) arr[pos2] = 0;
-                pos2++;
+        while (pos1 < arrSize - 1) {
+            if (isVec) {
+                AVec[pos1] += AVec[pos1 + 1];
+                pos2 = pos1 + 1;
+                while (pos2 < arrSize - 1) {
+                    AVec[pos2] = AVec[pos2 + 1];
+                    if (pos2 == arrSize - 1) AVec[pos2] = 0;
+                    pos2++;
+
+                }
+            }
+            else {
+                arr[pos1] += arr[pos1 + 1];
+                pos2 = pos1 + 1;
+                while (pos2 < arrSize - 1) {
+                    arr[pos2] = arr[pos2 + 1];
+                    if (pos2 == arrSize - 1) arr[pos2] = 0;
+                    pos2++;
+
+                }
 
             }
             arrSize--;
@@ -182,21 +378,41 @@ void Task2_v11(int arrSize, double* arr) {
 
     pos1 = elMin;
     pos2 = pos1;
-    elMin = arr[pos1]; // Minimal element
+    if (isVec) {
+        elMin = AVec[pos1]; // Minimal element
+    }
+    else {
+        elMin = arr[pos1]; // Minimal element
+    }
 
     
 
     while (pos1 < arrSize) {        // Finding last minimal element from pos1
-        if (arr[pos1] < elMin) {
-            elMin = arr[pos1];
-            pos2 = pos1;
+        if (isVec) {
+            if (AVec[pos1] < elMin) {
+                elMin = AVec[pos1];
+                pos2 = pos1;
+            }
+        }
+        else {
+            if (arr[pos1] < elMin) {
+                elMin = arr[pos1];
+                pos2 = pos1;
+            }
         }
         pos1++;
     }
 
     std::cout << "  ";
-    for (int i = 0; i < arrSize; i++)
-        std::cout << arr[i] << "   ";
+
+    if (isVec) {
+        for (int i = 0; i < arrSize; i++)
+            std::cout << AVec[i] << "   ";
+    }
+    else {
+        for (int i = 0; i < arrSize; i++)
+            std::cout << arr[i] << "   ";
+    }
     std::cout << "\n";
 
     if (pos2 != arrSize) {
@@ -212,7 +428,7 @@ void Task2_v11(int arrSize, double* arr) {
         std::cout << "  ";
         CText("Не існує мінімального елементу за умовою задачі!\n", 112);
     }
-   
+    userSize = arrSize;
    
 }
 
@@ -272,8 +488,12 @@ void ShowInputMenu() {
     CText(" Виберіть спосіб введення данних   \n", 225);
     std::cout << '\n';
     CText("  1. Рандомно\n", 11);
-    CText("  2. З консолі (статичний масив)\n", 11);
-    CText("  3. Вийти \n\n\n", 11);
+    CText("  2. З файлу\n", 11);
+    CText("  3. З консолі (статичний масив)\n", 11);
+    CText("  4. З консолі (динамічній масив <new>)\n", 11);
+    CText("  5. З консолі (динамічній масив <calloc>)\n", 11);
+    CText("  6. З консолі (динамічній масив <vector>)\n", 11);
+    CText("  7. Вийти \n\n\n", 11);
 
     CText("  Виберіть спосіб з меню : ", 3);
 
@@ -281,7 +501,7 @@ void ShowInputMenu() {
 
 
 
-int InputManager(double* arr, double* arr2) {
+void InputManager(double* arr, double* arr2, double* ANew = NULL) {
     int key;
     char buff[256];
     char fileAddress[1024];
@@ -291,7 +511,7 @@ int InputManager(double* arr, double* arr2) {
 
     if (std::cin.fail()) {
         std::cout << "  ";
-        CText("Невірно введений запит! Введіть число від 1 до 3\n", 112);
+        CText("Невірно введений запит! Введіть число від 1 до 6\n", 112);
         std::cin.clear();
         std::cin >> buff;
         InputManager(arr, arr2);
@@ -303,12 +523,30 @@ int InputManager(double* arr, double* arr2) {
         break;
 
     case 2:
+        std::cout << "  ";
+        CText("Введіть ім'я файлу (1.txt) (..\\1.txt) : ", 3);
+        std::cin >> fileAddress;
+        userSize = ReadArrayTextFile(ARRAY_MAX_SIZE, arr, fileAddress);
+        break;
+
+    case 3:
         userSize = ConsoleInputArray(ARRAY_MAX_SIZE, arr);
         break;
     
-    case 3:
+    case 4:
+        userSize = ConsoleInputDynamicArrayNew(ARRAY_MAX_SIZE, ANew);
         break;
 
+    case 5:
+        userSize = ConsoleInputDynamicArray_calloc(ARRAY_MAX_SIZE, ANew);
+        break;
+
+    case 6:
+        userSize = ConsoleInputVector(ARRAY_MAX_SIZE, AVec);
+        break;
+
+    case 7:
+        break;
     default:
         std::cout << "  ";
         CText("Вибраний не правильний спосіб!\n", 112);
@@ -317,7 +555,7 @@ int InputManager(double* arr, double* arr2) {
         break;
     }
 
-    return 0;
+    return;
 }
 
 
@@ -338,6 +576,7 @@ void ShowMainMenu() {
 void MenuManager(double *arr, double *arr2) {
     int key;
     char buff[256];
+   
 
     std::cin >> key;
 
@@ -353,6 +592,7 @@ void MenuManager(double *arr, double *arr2) {
     case 1:
         ShowInputMenu();
         InputManager(arr, arr2);
+        if (Pt != NULL) arr = Pt;
         WriteArrayTextFile(userSize, arr, "Task_1_Original_Array.txt");
     
         CText("\n\n  Результат задачі : \n", 3);
@@ -365,6 +605,7 @@ void MenuManager(double *arr, double *arr2) {
     case 2:
         ShowInputMenu();
         InputManager(arr, arr2);
+        if (Pt != NULL) arr = Pt;
         WriteArrayTextFile(userSize, arr, "Task_2_Original_Array.txt");
         
         CText("\n\n  Результат задачі : \n", 3);
@@ -413,10 +654,11 @@ int main() {
     system("chcp 1251");
     system("cls");
 
+  
     double A[ARRAY_MAX_SIZE], B[ARRAY_MAX_SIZE];
+    double *ANew;
 
-    
-
+   
     ShowMainMenu();
     MenuManager(A, B);
     
